@@ -11,7 +11,7 @@ class Solver(object):
 
     def lanczos(self):
         # Loop long enough, 
-        for _ in range(40000):
+        for i in range(40000):
             # Just apply Hessian operator for a given potential
             new_wf = self.wavefunction.hessian(self.potential)
             
@@ -26,7 +26,7 @@ class Solver(object):
             new_wf.normalize()
             
             # Check if we already converged
-            if self.wavefunction.difference(new_wf) < 0.1:
+            if self.wavefunction.difference(new_wf) < 0.1 and i > 100:
                 break
             
             # Store the new wavefunction and loop over
@@ -35,6 +35,8 @@ class Solver(object):
         print("E:", self.last_energy)
         self.wf_list.append(self.wavefunction)
 
+
+class Solver1D(Solver):
     def plot(self):
         plt.subplot(211)
         plt.title('Particle density')
@@ -47,4 +49,19 @@ class Solver(object):
             wf.plot_psi(plt)
         
         plt.show()
+
+class Solver2D(Solver):
+    def plot(self):
+        numpl = len(self.wf_list)
+        width = int(numpy.sqrt(numpl))
+        height = numpl / width
+
+        if width*height < numpl:
+            height += 1
             
+        for i, wf in enumerate(self.wf_list):
+            subplot_string = '{}{}{}'.format(width, height, i+1)
+            plt.subplot(subplot_string)
+            wf.plot_psi(plt)
+        
+        plt.show()
